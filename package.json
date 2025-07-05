@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint ./src --quiet",
+    "preview": "vite preview",
+    "predeploy": "pnpm run build",
+    "start": "pnpm run dev"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
