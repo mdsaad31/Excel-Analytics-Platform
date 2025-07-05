@@ -24,6 +24,18 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-undef': 'error',
+      
+      'react/jsx-no-undef': 'error',
+      'react/jsx-no-duplicate-props': 'error',
+      'react/no-direct-mutation-state': 'error',
+      
+      'react-hooks/rules-of-hooks': 'error',
+      
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
     },
   },
 ])
