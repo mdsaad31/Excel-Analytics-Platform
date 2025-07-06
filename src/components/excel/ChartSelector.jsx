@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart, Scatter, ScatterChart, Treemap, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { COLORS } from '../../data/mockData';
 import { exportChartAsPNG, exportChartAsPDF } from '../../utils/chartExport';
 
@@ -221,6 +221,149 @@ const ChartSelector = ({ data, activeSheet }) => {
           </ResponsiveContainer>
         );
         
+      case 'bubble':
+        if (yAxis.length < 3) {
+          return (
+            <div className="text-amber-600 text-center p-4 bg-amber-50 rounded">
+              Bubble chart requires at least 3 Y-axis selections (X, Y, and Size)
+            </div>
+          );
+        }
+        
+        const bubbleData = chartData.map(item => ({
+          x: parseFloat(item[yAxis[0]]) || 0,
+          y: parseFloat(item[yAxis[1]]) || 0,
+          z: parseFloat(item[yAxis[2]]) || 0,
+          name: item.name || 'Unknown',
+        }));
+        
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <ScatterChart data={bubbleData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" dataKey="x" name={yAxis[0]} />
+              <YAxis type="number" dataKey="y" name={yAxis[1]} />
+              <ZAxis type="number" dataKey="z" name={yAxis[2]} range={[60, 400]} />
+              <Tooltip 
+                cursor={{ strokeDasharray: '3 3' }}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const { name, x, y, z } = payload[0].payload;
+                    return (
+                      <div className="bg-white p-2 border border-gray-200 shadow-sm rounded-md">
+                        <p className="font-medium">{name}</p>
+                        <p className="text-sm">{yAxis[0]}: {x}</p>
+                        <p className="text-sm">{yAxis[1]}: {y}</p>
+                        <p className="text-sm">{yAxis[2]}: {z}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Legend />
+              <Scatter name="Data Points" fill="#8884d8" />
+            </ScatterChart>
+          </ResponsiveContainer>
+        );
+        
+      case 'gauge':
+        if (yAxis.length === 0) {
+          return (
+            <div className="text-amber-600 text-center p-4 bg-amber-50 rounded">
+              Gauge chart requires at least 1 Y-axis selection
+            </div>
+          );
+        }
+        
+        const gaugeValue = chartData.reduce((sum, item) => sum + (parseFloat(item[yAxis[0]]) || 0), 0) / chartData.length;
+        const maxVal = Math.max(...chartData.map(item => parseFloat(item[yAxis[0]]) || 0));
+        
+        const gaugeData = [
+          { name: 'value', value: gaugeValue },
+          { name: 'empty', value: maxVal - gaugeValue }
+        ];
+        
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={gaugeData}
+                cx="50%"
+                cy="50%"
+                startAngle={180}
+                endAngle={0}
+                innerRadius={60}
+                outerRadius={120}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                <Cell fill="#8884d8" />
+                <Cell fill="#e0e0e0" />
+              </Pie>
+              <Tooltip />
+              <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-800">
+                {gaugeValue.toFixed(1)}
+              </text>
+            </PieChart>
+          </ResponsiveContainer>
+        );
+        
+      case 'treemap':
+        if (yAxis.length === 0) {
+          return (
+            <div className="text-amber-600 text-center p-4 bg-amber-50 rounded">
+              Tree map requires at least 1 Y-axis selection
+            </div>
+          );
+        }
+        
+        const treemapData = chartData.map((item, index) => ({
+          name: item.name || `Item ${index + 1}`,
+          value: parseFloat(item[yAxis[0]]) || 0,
+          fill: COLORS[index % COLORS.length]
+        }));
+        
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <Treemap
+              data={treemapData}
+              dataKey="value"
+              ratio={4/3}
+              stroke="#fff"
+              strokeWidth={2}
+              content={({ root, depth, x, y, width, height, index, name, value }) => {
+                return (
+                  <g>
+                    <rect
+                      x={x}
+                      y={y}
+                      width={width}
+                      height={height}
+                      style={{
+                        fill: treemapData[index]?.fill || '#8884d8',
+                        stroke: '#fff',
+                        strokeWidth: 2,
+                        strokeOpacity: 1,
+                      }}
+                    />
+                    {width > 60 && height > 40 && (
+                      <text x={x + width / 2} y={y + height / 2} textAnchor="middle" fill="#fff" fontSize="14" fontWeight="bold">
+                        {name}
+                      </text>
+                    )}
+                    {width > 60 && height > 60 && (
+                      <text x={x + width / 2} y={y + height / 2 + 16} textAnchor="middle" fill="#fff" fontSize="12">
+                        {value}
+                      </text>
+                    )}
+                  </g>
+                );
+              }}
+            />
+          </ResponsiveContainer>
+        );
+        
       default:
         return null;
     }
@@ -322,6 +465,9 @@ const ChartSelector = ({ data, activeSheet }) => {
               <option value="pie">Pie Chart</option>
               <option value="radar">Radar Chart</option>
               <option value="scatter">Scatter Plot</option>
+              <option value="bubble">Bubble Chart</option>
+              <option value="gauge">Gauge Chart</option>
+              <option value="treemap">Tree Map</option>
             </select>
           </div>
           
@@ -331,7 +477,7 @@ const ChartSelector = ({ data, activeSheet }) => {
               className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               value={xAxis}
               onChange={(e) => setXAxis(e.target.value)}
-              disabled={chartType === 'scatter'}
+              disabled={['scatter', 'bubble', 'gauge', 'treemap'].includes(chartType)}
             >
               {categoricalColumns.map(col => (
                 <option key={col} value={col}>{col}</option>

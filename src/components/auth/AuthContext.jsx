@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const AuthContext = createContext();
 
@@ -8,67 +8,19 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('excelAnalyticsToken');
-      
-      if (token) {
-        setCurrentUser({
-          name: 'Demo User',
-          email: 'user@example.com',
-          id: 'demo-user-id'
-        });
-      } else {
-        setCurrentUser(null);
-      }
-      
-      setLoading(false);
-    };
-    
-    checkAuth();
-  }, []);
-
-  const login = async (email, password) => {
-    localStorage.setItem('excelAnalyticsToken', 'demo-token');
-    setCurrentUser({
-      name: 'Demo User',
-      email,
-      id: 'demo-user-id'
-    });
-    return true;
-  };
-
-  const register = async (name, email, password) => {
-    localStorage.setItem('excelAnalyticsToken', 'demo-token');
-    setCurrentUser({
-      name,
-      email,
-      id: 'demo-user-id'
-    });
-    return true;
-  };
-
-  const logout = () => {
-    localStorage.removeItem('excelAnalyticsToken');
-    setCurrentUser(null);
-    navigate('/login');
-  };
+  const { user, loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
 
   const value = {
-    currentUser,
-    login,
-    register,
-    logout,
-    isAuthenticated: !!currentUser
+    currentUser: user,
+    login: loginWithRedirect,
+    logout: () => logout({ logoutParams: { returnTo: window.location.origin } }),
+    isAuthenticated,
+    isLoading,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };
