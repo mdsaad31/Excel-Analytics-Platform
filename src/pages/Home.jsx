@@ -1,8 +1,17 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../components/auth/AuthContext';
 
 const Home = () => {
-  const navigate = useNavigate();
+  const { isAuthenticated, isLoading, login } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -11,16 +20,16 @@ const Home = () => {
           <h1 className="text-3xl font-bold text-gray-900">Excel Analytics Platform</h1>
           <div>
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => login()}
               className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2"
             >
               Login
             </button>
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => login({ screen_hint: 'signup' })}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
-              Register
+              Sign Up
             </button>
           </div>
         </div>
@@ -96,7 +105,7 @@ const Home = () => {
 
           <div className="mt-12 flex justify-center">
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => login({ screen_hint: 'signup' })}
               className="px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-md"
             >
               Get Started for Free

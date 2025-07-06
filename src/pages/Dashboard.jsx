@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import ExcelUploader from '../components/excel/ExcelUploader';
 import DataViewer from '../components/excel/DataViewer';
@@ -10,6 +10,16 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [reuseFileName, setReuseFileName] = useState(null);
+
+  useEffect(() => {
+    if (location.state && location.state.fileName) {
+      setReuseFileName(location.state.fileName);
+      // Clear the state after using it to prevent message from reappearing on subsequent visits
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   const handleDataParsed = (data) => {
     setExcelData(data);
@@ -47,29 +57,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <div className="flex items-center">
-            <div className="mr-4">
-              <span className="text-sm text-gray-600">Welcome, </span>
-              <span className="font-semibold">{currentUser?.name || 'User'}</span>
-            </div>
-            <button
-              onClick={logout}
-              className="ml-3 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition ease-in-out duration-150"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Excel Data Explorer</h2>
             <div className="flex space-x-4">
@@ -114,6 +103,12 @@ const Dashboard = () => {
           {/* File uploader */}
           <div className={`mb-8 ${excelData ? 'bg-white p-6 rounded-lg shadow-sm' : ''}`}>
             <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Excel File</h3>
+            {reuseFileName && (
+              <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4" role="alert">
+                <p className="font-bold">Reusing File</p>
+                <p>Please re-upload the file named: <span className="font-semibold">{reuseFileName}</span></p>
+              </div>
+            )}
             <ExcelUploader onDataParsed={handleDataParsed} />
           </div>
 
@@ -138,7 +133,6 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-      </main>
     </div>
   );
 };

@@ -1,19 +1,24 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { AuthProvider } from './components/auth/AuthContext';
+import { AuthProvider, useAuth } from './components/auth/AuthContext';
 import Login from './components/auth/Login';
-import Register from './components/auth/Register';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Analysis from './pages/Analysis';
+import History from './pages/History';
+import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('excelAnalyticsToken') !== null;
-  
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-  
+
   return children;
 };
 
@@ -25,14 +30,13 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           
           {/* Protected routes */}
           <Route 
             path="/dashboard" 
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout><Dashboard /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -40,7 +44,15 @@ function App() {
             path="/analysis" 
             element={
               <ProtectedRoute>
-                <Analysis />
+                <Layout><Analysis /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/history" 
+            element={
+              <ProtectedRoute>
+                <Layout><History /></Layout>
               </ProtectedRoute>
             } 
           />

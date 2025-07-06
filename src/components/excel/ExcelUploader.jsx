@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import axios from 'axios';
+import { useAuth } from '../auth/AuthContext';
 import { parseExcelFile } from './ExcelParser';
 
 const ExcelUploader = ({ onDataParsed }) => {
@@ -6,6 +8,7 @@ const ExcelUploader = ({ onDataParsed }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
+  const { currentUser } = useAuth();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -33,9 +36,21 @@ const ExcelUploader = ({ onDataParsed }) => {
     try {
       const parsedData = await parseExcelFile(selectedFile);
       onDataParsed(parsedData);
+
+      if (currentUser) {
+        const historyData = {
+          fileName: selectedFile.name,
+          uploadDate: new Date(),
+          size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+          user: currentUser.sub,
+        };
+
+        await axios.post('http://localhost:5000/history/add', historyData);
+      }
+
     } catch (err) {
-      console.error('Error parsing Excel file:', err);
-      setError(`Failed to parse file: ${err.message}`);
+      console.error('Error parsing or uploading Excel file:', err);
+      setError(`Failed to process file: ${err.message}`);
     } finally {
       setIsLoading(false);
     }

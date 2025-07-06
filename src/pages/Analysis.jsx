@@ -48,29 +48,8 @@ const Analysis = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Data Analysis</h1>
-          <div className="flex items-center">
-            <div className="mr-4">
-              <span className="text-sm text-gray-600">Welcome, </span>
-              <span className="font-semibold">{currentUser?.name || 'User'}</span>
-            </div>
-            <button
-              onClick={logout}
-              className="ml-3 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition ease-in-out duration-150"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Visualization Tools</h2>
             <button
@@ -135,8 +114,7 @@ const Analysis = () => {
             </ul>
           </div>
         </div>
-      </main>
-    </div>
+        </div>
   );
 };
 
