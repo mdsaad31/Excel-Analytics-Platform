@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { COLORS } from '../../data/mockData';
+import { exportChartAsPNG, exportChartAsPDF } from '../../utils/chartExport';
 
 const ChartSelector = ({ data, activeSheet }) => {
+  const chartRef = useRef(null);
   const [chartType, setChartType] = useState('bar');
   const [xAxis, setXAxis] = useState('');
   const [yAxis, setYAxis] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [isExporting, setIsExporting] = useState(false);
   
   const sheetData = data?.sheets?.[activeSheet] || [];
   const headers = data?.headers?.[activeSheet] || [];
@@ -223,10 +226,87 @@ const ChartSelector = ({ data, activeSheet }) => {
     }
   };
   
+  const handleExportPNG = async () => {
+    if (!chartData.length) {
+      alert('No chart data to export. Please generate a chart first.');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const fileName = `${activeSheet}-${chartType}-chart`;
+      await exportChartAsPNG('chart-container', fileName);
+      const successMsg = document.createElement('div');
+      successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+      successMsg.textContent = 'Chart exported as PNG successfully!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => document.body.removeChild(successMsg), 3000);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export chart as PNG. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!chartData.length) {
+      alert('No chart data to export. Please generate a chart first.');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const fileName = `${activeSheet}-${chartType}-chart`;
+      const title = `${activeSheet} ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`;
+      await exportChartAsPDF('chart-container', fileName, { title });
+      const successMsg = document.createElement('div');
+      successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+      successMsg.textContent = 'Chart exported as PDF successfully!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => document.body.removeChild(successMsg), 3000);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export chart as PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">Chart Generator</h2>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-xl font-semibold text-gray-800">Chart Generator</h2>
+          
+          {chartData.length > 0 && (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleExportPNG}
+                disabled={isExporting}
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Export as PNG"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+                {isExporting ? 'Exporting...' : 'PNG'}
+              </button>
+              
+              <button
+                onClick={handleExportPDF}
+                disabled={isExporting}
+                className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Export as PDF"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                </svg>
+                {isExporting ? 'Exporting...' : 'PDF'}
+              </button>
+            </div>
+          )}
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
@@ -285,7 +365,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         </div>
       </div>
       
-      <div className="border rounded-lg p-4 bg-gray-50 min-h-80">
+      <div id="chart-container" ref={chartRef} className="border rounded-lg p-4 bg-gray-50 min-h-80">
         {renderChart()}
         {chartData.length === 0 && (
           <div className="h-80 flex items-center justify-center text-gray-500">
