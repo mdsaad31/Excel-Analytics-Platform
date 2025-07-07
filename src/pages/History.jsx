@@ -29,7 +29,7 @@ const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/history/${id}`);
+      await axios.delete(`/api/history/${id}`);
       setHistory(history.filter(item => item._id !== id));
     } catch (error) {
       console.error('Error deleting history entry:', error);
