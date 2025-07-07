@@ -12,6 +12,10 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   console.log('INCOMING REQUEST:', { path: req.path, originalUrl: req.originalUrl, url: req.url });
+  // Manually rewrite the URL for Express
+  if (req.originalUrl.startsWith('/.netlify/functions/api')) {
+    req.url = req.originalUrl.replace('/.netlify/functions/api', '');
+  }
   next();
 });
 
