@@ -15,4 +15,8 @@ require('./db');
 const historyRouter = require('./routes/history');
 app.use('/history', historyRouter);
 
+app.get('/test', (req, res) => {
+  res.send('Test route works!');
+});
+
 module.exports.handler = serverless(app);
