@@ -10,12 +10,14 @@ const router = express.Router();
 app.use(cors());
 app.use(express.json());
 
+// MongoDB Connection
 const uri = process.env.MONGODB_URI;
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB database connection established successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+// FileHistory Schema and Model
 const fileHistorySchema = new mongoose.Schema({
   fileName: { type: String, required: true, trim: true },
   uploadDate: { type: Date, required: true },
@@ -25,7 +27,8 @@ const fileHistorySchema = new mongoose.Schema({
 
 const FileHistory = mongoose.model('FileHistory', fileHistorySchema);
 
-router.get('/', async (req, res) => {
+// Routes
+router.get('/history', async (req, res) => {
   try {
     const history = await FileHistory.find({ user: req.query.user });
     res.json(history);
@@ -34,7 +37,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/add', async (req, res) => {
+router.post('/history/add', async (req, res) => {
   try {
     const { fileName, uploadDate, size, user } = req.body;
     const newFileHistory = new FileHistory({ fileName, uploadDate, size, user });
@@ -45,7 +48,7 @@ router.post('/add', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/history/:id', async (req, res) => {
   try {
     await FileHistory.findByIdAndDelete(req.params.id);
     res.json('File history deleted.');
@@ -54,9 +57,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-app.use('/history', router);
+app.use('/.netlify/functions/api', router); // Mount the router at the base path of the Netlify function
 
-module.exports.handler = async (event, context) => {
-  console.log('NETLIFY EVENT PATH:', event.path);
-  return serverless(app)(event, context);
-};
+module.exports.handler = serverless(app);
