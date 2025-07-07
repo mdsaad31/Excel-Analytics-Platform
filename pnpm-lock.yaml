@@ -20,6 +20,9 @@ importers:
       axios:
         specifier: ^1.10.0
         version: 1.10.0
+      bson:
+        specifier: ^6.10.4
+        version: 6.10.4
       chart.js:
         specifier: ^4.5.0
         version: 4.5.0
