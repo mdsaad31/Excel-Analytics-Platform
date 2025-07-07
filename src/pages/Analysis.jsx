@@ -49,7 +49,7 @@ const Analysis = () => {
 
   return (
     <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Visualization Tools</h2>
             <button
@@ -85,7 +85,7 @@ const Analysis = () => {
           )}
 
           {/* Chart selector */}
-          <div className="mb-8">
+          <div className="mb-8 overflow-x-auto">
             <ChartSelector data={excelData} activeSheet={activeSheet} />
           </div>
           
