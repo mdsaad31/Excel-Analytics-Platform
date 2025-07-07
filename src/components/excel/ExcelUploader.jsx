@@ -45,7 +45,7 @@ const ExcelUploader = ({ onDataParsed }) => {
           user: currentUser.sub,
         };
 
-        await axios.post('http://localhost:5000/history/add', historyData);
+        await axios.post('/.netlify/functions/api/history/add', historyData);
       }
 
     } catch (err) {

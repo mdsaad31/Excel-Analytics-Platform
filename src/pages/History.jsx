@@ -17,7 +17,7 @@ const History = () => {
   const fetchHistory = async () => {
     if (currentUser) {
       try {
-        const response = await axios.get(`http://localhost:5000/history?user=${currentUser.sub}`);
+        const response = await axios.get(`/.netlify/functions/api/history?user=${currentUser.sub}`);
         setHistory(response.data);
       } catch (error) {
         console.error('Error fetching history:', error);
@@ -29,8 +29,8 @@ const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/history/${id}`);
-      setHistory(history.filter(item => item._id !== id));
+      await axios.delete(`/.netlify/functions/api/history/${id}`);
+      setHistory(history.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting history entry:', error);
     }
@@ -72,7 +72,7 @@ const History = () => {
               </thead>
               <tbody>
                 {history.map((item) => (
-                  <tr key={item._id}>
+                  <tr key={item.id}>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                       <p className="text-gray-900 whitespace-no-wrap">{item.fileName}</p>
                     </td>
