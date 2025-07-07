@@ -1,0 +1,44 @@
+services:
+  # Backend API Service
+  - type: web
+    name: excel-analytics-api
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        sync: false
+    autoDeploy: false
+
+  # Frontend Static Site
+  - type: web
+    name: excel-analytics-frontend
+    env: static
+    plan: free
+    buildCommand: pnpm install && pnpm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_AUTH0_DOMAIN
+        value: dev-2qbii11mw3ffkhzj.us.auth0.com
+      - key: VITE_AUTH0_CLIENT_ID
+        value: bxFFPYN61oKDIyZP6ikbYwGgMtDqx4iy
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: false
+
+databases:
+  - name: excel-analytics-db
+    databaseName: excel_analytics
+    user: excel_user
+    plan: free
