@@ -10,6 +10,11 @@ const router = express.Router();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log('INCOMING REQUEST PATH: ', req.path);
+  next();
+});
+
 const uri = process.env.MONGODB_URI;
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
