@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
-  console.log('INCOMING REQUEST PATH: ', req.path);
+  console.log('INCOMING REQUEST:', { path: req.path, originalUrl: req.originalUrl, url: req.url });
   next();
 });
 
