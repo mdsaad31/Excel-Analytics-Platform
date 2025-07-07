@@ -54,6 +54,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-app.use('/api/history', router);
+app.use('/history', router);
 
 module.exports.handler = serverless(app);
