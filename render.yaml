@@ -18,10 +18,11 @@ services:
     autoDeploy: false
 
   # Frontend Static Site
-  - type: static_site
+  - type: web
     name: excel-analytics-frontend
+    env: static
     buildCommand: pnpm install && pnpm run build
-    publishPath: ./dist
+    staticPublishPath: ./dist
     envVars:
       - key: VITE_AUTH0_DOMAIN
         value: dev-2qbii11mw3ffkhzj.us.auth0.com
