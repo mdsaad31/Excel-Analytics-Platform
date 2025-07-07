@@ -30,7 +30,7 @@ const History = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/history/${id}`);
-      setHistory(history.filter(item => item._id !== id));
+      setHistory(history.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting history entry:', error);
     }
@@ -72,13 +72,13 @@ const History = () => {
               </thead>
               <tbody>
                 {history.map((item) => (
-                  <tr key={item._id}>
+                  <tr key={item.id}>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{item.fileName}</p>
+                      <p className="text-gray-900 whitespace-no-wrap">{item.file_name}</p>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                       <p className="text-gray-900 whitespace-no-wrap">
-                        {new Date(item.uploadDate).toLocaleDateString()}
+                        {new Date(item.upload_date).toLocaleDateString()}
                       </p>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -86,13 +86,13 @@ const History = () => {
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                       <button
-                        onClick={() => handleDelete(item._id)}
+                        onClick={() => handleDelete(item.id)}
                         className="text-red-600 hover:text-red-900 mr-3"
                       >
                         Delete
                       </button>
                       <button
-                        onClick={() => handleReuse(item.fileName)}
+                        onClick={() => handleReuse(item.file_name)}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         Reuse
