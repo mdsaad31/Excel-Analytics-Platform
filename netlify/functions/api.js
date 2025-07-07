@@ -10,15 +10,6 @@ const router = express.Router();
 app.use(cors());
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log('INCOMING REQUEST:', { path: req.path, originalUrl: req.originalUrl, url: req.url });
-  // Manually rewrite the URL for Express
-  if (req.originalUrl.startsWith('/.netlify/functions/api')) {
-    req.url = req.originalUrl.replace('/.netlify/functions/api', '');
-  }
-  next();
-});
-
 const uri = process.env.MONGODB_URI;
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -65,4 +56,7 @@ router.delete('/:id', async (req, res) => {
 
 app.use('/history', router);
 
-module.exports.handler = serverless(app, { base: '/.netlify/functions/api' });
+module.exports.handler = async (event, context) => {
+  console.log('NETLIFY EVENT PATH:', event.path);
+  return serverless(app)(event, context);
+};
