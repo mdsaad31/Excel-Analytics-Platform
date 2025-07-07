@@ -61,4 +61,4 @@ router.delete('/:id', async (req, res) => {
 
 app.use('/history', router);
 
-module.exports.handler = serverless(app);
+module.exports.handler = serverless(app, { base: '/.netlify/functions/api' });
