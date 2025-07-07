@@ -1,4 +1,5 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 let FileHistory = require('../models/fileHistory.model');
 
 // Get all history for a user
