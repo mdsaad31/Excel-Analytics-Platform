@@ -38,5 +38,8 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+[[plugins]]
+package = "@netlify/plugin-functions-install-core"
+
 [functions]
   directory = "server"
