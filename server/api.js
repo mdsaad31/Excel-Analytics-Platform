@@ -15,4 +15,4 @@ require('./db');
 const historyRouter = require('./routes/history');
 app.use('/history', historyRouter);
 
-module.exports.handler = serverless(app);
+module.exports.handler = serverless(app, { base: '/.netlify/functions/api' });
