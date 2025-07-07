@@ -1,41 +1,42 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginReactRefresh from "eslint-plugin-react-refresh";
 
-export default defineConfig([
-  globalIgnores(['dist']),
+export default [
   {
-    files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
+    ignores: ["dist"],
+  },
+  {
+    files: ["**/*.{js,jsx}"],
+    ...pluginJs.configs.recommended,
+    ...pluginReactConfig,
     languageOptions: {
-      ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
+    plugins: {
+      "react-hooks": pluginReactHooks,
+      "react-refresh": pluginReactRefresh,
+    },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'no-undef': 'error',
-      
-      'react/jsx-no-undef': 'error',
-      'react/jsx-no-duplicate-props': 'error',
-      'react/no-direct-mutation-state': 'error',
-      
-      'react-hooks/rules-of-hooks': 'error',
-      
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
+      "no-unused-vars": ["error", { "varsIgnorePattern": "^[A-Z_]" }],
+      "no-undef": "error",
+      "react/jsx-no-undef": "error",
+      "react/jsx-no-duplicate-props": "error",
+      "react/no-direct-mutation-state": "error",
+      "react-hooks/rules-of-hooks": "error",
+      "react-refresh/only-export-components": [
+        "warn",
+        { "allowConstantExport": true },
       ],
     },
   },
-])
+];
