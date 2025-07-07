@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../components/auth/AuthContext';
-
+import { API_ENDPOINTS } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 
 const History = () => {
@@ -17,7 +17,7 @@ const History = () => {
   const fetchHistory = async () => {
     if (currentUser) {
       try {
-        const response = await axios.get(`http://localhost:5000/history?user=${currentUser.sub}`);
+        const response = await axios.get(`${API_ENDPOINTS.HISTORY}?user=${currentUser.sub}`);
         setHistory(response.data);
       } catch (error) {
         console.error('Error fetching history:', error);
@@ -29,7 +29,7 @@ const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/history/${id}`);
+      await axios.delete(API_ENDPOINTS.HISTORY_DELETE(id));
       setHistory(history.filter(item => item._id !== id));
     } catch (error) {
       console.error('Error deleting history entry:', error);

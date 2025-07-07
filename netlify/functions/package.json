@@ -1,0 +1,9 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Excel Analytics Platform",
+  "main": "index.js",
+  "dependencies": {
+    "mongoose": "^8.16.1"
+  }
+}

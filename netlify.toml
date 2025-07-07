@@ -12,10 +12,20 @@
   # Use pnpm as package manager
   NPM_FLAGS = "--version" # This tells Netlify to use pnpm
 
+[functions]
+  # Directory with serverless functions
+  directory = "netlify/functions"
+
 # SPA redirect rules - this is crucial for React Router
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+# API proxy for local development
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 # Security headers

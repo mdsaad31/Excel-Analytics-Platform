@@ -9,7 +9,9 @@
     "lint": "eslint ./src --quiet",
     "preview": "vite preview",
     "predeploy": "pnpm run build",
-    "start": "pnpm run dev"
+    "start": "pnpm run dev",
+    "dev:functions": "netlify dev",
+    "deploy": "netlify deploy --prod --dir=dist"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
 import { parseExcelFile } from './ExcelParser';
+import { API_ENDPOINTS } from '../../utils/api';
 
 const ExcelUploader = ({ onDataParsed }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -45,7 +46,7 @@ const ExcelUploader = ({ onDataParsed }) => {
           user: currentUser.sub,
         };
 
-        await axios.post('http://localhost:5000/history/add', historyData);
+        await axios.post(API_ENDPOINTS.HISTORY_ADD, historyData);
       }
 
     } catch (err) {
