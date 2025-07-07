@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   
   const menuItems = [
@@ -12,26 +12,64 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="bg-white shadow-sm w-64 hidden md:block">
-      <div className="p-6">
-        <nav className="mt-4">
-          <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.id}>
+    <>
+      {/* Mobile sidebar */}
+      <div
+        className={`fixed inset-0 z-40 flex md:hidden ${isOpen ? '' : 'hidden'}`}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          aria-hidden="true"
+          onClick={toggleSidebar}
+        ></div>
+
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+          <div className="absolute top-0 right-0 -mr-12 pt-2">
+            <button
+              type="button"
+              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              onClick={toggleSidebar}
+            >
+              <span className="sr-only">Close sidebar</span>
+              <svg
+                className="h-6 w-6 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+            <div className="flex-shrink-0 flex items-center px-4">
+              <div className="text-xl font-bold text-indigo-600">Analytics</div>
+            </div>
+            <nav className="mt-5 px-2 space-y-1">
+              {menuItems.map((item) => (
                 <Link
+                  key={item.id}
                   to={item.path}
-                  className={`flex items-center px-4 py-3 text-sm rounded-md ${
-                    location.pathname === item.path
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
+                  onClick={toggleSidebar} // Close sidebar on navigation
+                  className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${location.pathname === item.path ? 'bg-indigo-100 text-indigo-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                 >
                   <svg
+                    className={`mr-4 flex-shrink-0 h-6 w-6 ${location.pathname === item.path ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500'}`}
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-3"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -42,12 +80,51 @@ const Sidebar = () => {
                   </svg>
                   {item.name}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        <div className="flex-shrink-0 w-14" aria-hidden="true"></div>
       </div>
-    </aside>
+
+      {/* Desktop sidebar */}
+      <div className="hidden md:flex md:flex-shrink-0">
+        <div className="flex flex-col w-64">
+          <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto bg-white border-r border-gray-200">
+            <div className="flex items-center flex-shrink-0 px-4">
+              <div className="text-xl font-bold text-indigo-600">Analytics</div>
+            </div>
+            <nav className="mt-5 flex-1 px-2 space-y-1">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.id}
+                  to={item.path}
+                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${location.pathname === item.path ? 'bg-indigo-100 text-indigo-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                >
+                  <svg
+                    className={`mr-3 flex-shrink-0 h-6 w-6 ${location.pathname === item.path ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500'}`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={item.icon}
+                    />
+                  </svg>
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

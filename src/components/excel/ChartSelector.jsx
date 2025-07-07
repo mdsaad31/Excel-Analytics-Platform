@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart, Scatter, ScatterChart, Treemap, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { COLORS } from '../../data/mockData';
 import { exportChartAsPNG, exportChartAsPDF } from '../../utils/chartExport';
@@ -10,9 +10,114 @@ const ChartSelector = ({ data, activeSheet }) => {
   const [yAxis, setYAxis] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
-  
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [startRow, setStartRow] = useState(1); // 1-based index for user
+  const [endRow, setEndRow] = useState(50); // 1-based index for user
+
+  const trackRef = useRef(null);
+  const activeThumbRef = useRef(null); // Reintroduce activeThumbRef
+
   const sheetData = data?.sheets?.[activeSheet] || [];
   const headers = data?.headers?.[activeSheet] || [];
+
+  // Refs for mutable values in useCallback
+  const startRowRef = useRef(startRow);
+  const endRowRef = useRef(endRow);
+  const sheetDataLengthRef = useRef(sheetData.length);
+
+  // Update refs whenever state changes
+  useEffect(() => { startRowRef.current = startRow; }, [startRow]);
+  useEffect(() => { endRowRef.current = endRow; }, [endRow]);
+  useEffect(() => { sheetDataLengthRef.current = sheetData.length; }, [sheetData.length]);
+
+  const handleMouseMove = useCallback((e) => {
+    console.log('handleMouseMove: activeThumbRef.current', activeThumbRef.current, 'trackRef.current', trackRef.current);
+    if (!activeThumbRef.current || !trackRef.current) {
+      return;
+    }
+
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const mouseX = e.clientX;
+    let newPercentage = (mouseX - trackRect.left) / trackRect.width;
+    newPercentage = Math.max(0, Math.min(1, newPercentage));
+
+    const totalRows = sheetDataLengthRef.current;
+    let newRow;
+
+    if (totalRows <= 1) {
+      newRow = 1;
+    } else {
+      newRow = Math.round(newPercentage * (totalRows - 1)) + 1;
+    }
+
+    if (activeThumbRef.current === 'start') {
+      setStartRow(Math.min(newRow, endRowRef.current));
+    } else if (activeThumbRef.current === 'end') {
+      setEndRow(Math.max(newRow, startRowRef.current));
+    }
+  }, [setStartRow, setEndRow, trackRef]);
+
+  const handleMouseUp = useCallback(() => {
+    console.log('handleMouseUp');
+    activeThumbRef.current = null;
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseMove]);
+
+  const handleMouseDown = useCallback((e, thumb) => {
+    console.log('handleMouseDown: thumb', thumb, 'e.clientX', e.clientX);
+    e.preventDefault();
+    activeThumbRef.current = thumb;
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  }, [handleMouseMove, handleMouseUp]);
+
+  // Touch event handlers
+  const handleTouchMove = useCallback((e) => {
+    console.log('handleTouchMove: activeThumbRef.current', activeThumbRef.current, 'trackRef.current', trackRef.current);
+    if (!activeThumbRef.current || !trackRef.current) {
+      return;
+    }
+
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const touchX = e.touches[0].clientX;
+    let newPercentage = (touchX - trackRect.left) / trackRect.width;
+    newPercentage = Math.max(0, Math.min(1, newPercentage));
+
+    const totalRows = sheetDataLengthRef.current;
+    let newRow;
+
+    if (totalRows <= 1) {
+      newRow = 1;
+    } else {
+      newRow = Math.round(newPercentage * (totalRows - 1)) + 1;
+    }
+
+    if (activeThumbRef.current === 'start') {
+      setStartRow(Math.min(newRow, endRowRef.current));
+    } else if (activeThumbRef.current === 'end') {
+      setEndRow(Math.max(newRow, startRowRef.current));
+    }
+  }, [setStartRow, setEndRow, trackRef]);
+
+  const handleTouchEnd = useCallback(() => {
+    console.log('handleTouchEnd');
+    activeThumbRef.current = null;
+    window.removeEventListener('touchmove', handleTouchMove);
+    window.removeEventListener('touchend', handleTouchEnd);
+  }, [handleTouchMove]);
+
+  const handleTouchStart = useCallback((e, thumb) => {
+    console.log('handleTouchStart: thumb', thumb, 'e.touches[0].clientX', e.touches[0].clientX);
+    e.preventDefault();
+    activeThumbRef.current = thumb;
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+  }, [handleTouchMove, handleTouchEnd]);
+  
+  // sheetData and headers are now defined earlier
+  // const sheetData = data?.sheets?.[activeSheet] || [];
+  // const headers = data?.headers?.[activeSheet] || [];
   
   const numericColumns = headers.filter(header => {
     if (sheetData.length === 0) return false;
@@ -32,7 +137,19 @@ const ChartSelector = ({ data, activeSheet }) => {
     if (numericColumns.length > 0) {
       setYAxis([numericColumns[0]]);
     }
-  }, [activeSheet, data]);
+
+    // Adjust endRow if it's greater than the actual data length
+    if (sheetData.length > 0) {
+      setEndRow(prevEndRow => Math.min(prevEndRow, sheetData.length));
+    } else {
+      setEndRow(1); // If no data, set endRow to 1
+    }
+
+    // Ensure startRow is not greater than endRow, and is at least 1
+    setStartRow(prevStartRow => Math.min(prevStartRow, endRow || 1));
+    setStartRow(prevStartRow => Math.max(1, prevStartRow));
+
+  }, [activeSheet, data, sheetData.length, endRow]);
   
   useEffect(() => {
     if (!xAxis || yAxis.length === 0 || !sheetData.length) {
@@ -51,8 +168,17 @@ const ChartSelector = ({ data, activeSheet }) => {
       return dataPoint;
     });
     
-    setChartData(preparedData.slice(0, 50));
-  }, [xAxis, yAxis, sheetData, activeSheet]);
+    // Apply row selection, ensuring valid range
+    const actualStartRow = Math.max(0, startRow - 1);
+    const actualEndRow = Math.min(sheetData.length, endRow);
+
+    if (actualStartRow >= actualEndRow) {
+      setChartData([]);
+      return;
+    }
+
+    setChartData(preparedData.slice(actualStartRow, actualEndRow));
+  }, [xAxis, yAxis, sheetData, activeSheet, startRow, endRow]);
   
   const handleYAxisChange = (column, isChecked) => {
     if (isChecked) {
@@ -76,7 +202,7 @@ const ChartSelector = ({ data, activeSheet }) => {
     switch(chartType) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
@@ -92,7 +218,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         
       case 'line':
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
@@ -114,7 +240,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         
       case 'area':
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
@@ -144,7 +270,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         }));
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -178,7 +304,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         });
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
               <PolarGrid />
               <PolarAngleAxis dataKey="name" />
@@ -209,7 +335,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         }
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={yAxis[0]} type="number" name={yAxis[0]} />
@@ -238,7 +364,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         }));
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <ScatterChart data={bubbleData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" dataKey="x" name={yAxis[0]} />
@@ -285,7 +411,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         ];
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <PieChart>
               <Pie
                 data={gaugeData}
@@ -325,7 +451,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         }));
         
         return (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={600}>
             <Treemap
               data={treemapData}
               dataKey="value"
@@ -509,9 +635,71 @@ const ChartSelector = ({ data, activeSheet }) => {
             </div>
           </div>
         </div>
+        
+        <div className="mb-4">
+          <button
+            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none"
+          >
+            {showAdvancedSettings ? 'Hide Advanced Settings' : 'Show Advanced Settings'}
+          </button>
+
+          {showAdvancedSettings && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative pt-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Row Range: {startRow} - {endRow}</label>
+                <div className="relative h-2 bg-gray-200 rounded-full" ref={trackRef}>
+                  <div
+                    className="absolute h-full bg-blue-500 rounded-full"
+                    style={{
+                      left: `${((startRow - 1) / (sheetData.length > 1 ? sheetData.length - 1 : 1)) * 100}%`,
+                      width: `${((endRow - startRow) / (sheetData.length > 1 ? sheetData.length - 1 : 1)) * 100}%`,
+                    }}
+                  ></div>
+                  {/* Start Thumb */}
+                  <div
+                    className="absolute w-5 h-5 bg-blue-700 rounded-full shadow-md cursor-pointer"
+                    style={{
+                      left: `${((startRow - 1) / (sheetData.length > 1 ? sheetData.length - 1 : 1)) * 100}%`,
+                      transform: 'translateX(-50%)',
+                      top: '-6px',
+                      zIndex: 10,
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation(); // Prevent event from bubbling up
+                      handleMouseDown(e, 'start');
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation(); // Prevent event from bubbling up
+                      handleTouchStart(e, 'start');
+                    }}
+                  ></div>
+                  {/* End Thumb */}
+                  <div
+                    className="absolute w-5 h-5 bg-blue-700 rounded-full shadow-md cursor-pointer"
+                    style={{
+                      left: `${((endRow - 1) / (sheetData.length > 1 ? sheetData.length - 1 : 1)) * 100}%`,
+                      transform: 'translateX(-50%)',
+                      top: '-6px',
+                      zIndex: 10,
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation(); // Prevent event from bubbling up
+                      handleMouseDown(e, 'end');
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation(); // Prevent event from bubbling up
+                      handleTouchStart(e, 'end');
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
-      <div id="chart-container" ref={chartRef} className="border rounded-lg p-4 bg-gray-50 min-h-80">
+      <div id="chart-container" ref={chartRef} className="border rounded-lg p-4 bg-gray-50 min-h-80 min-w-[700px]">
         {renderChart()}
         {chartData.length === 0 && (
           <div className="h-80 flex items-center justify-center text-gray-500">
@@ -520,11 +708,7 @@ const ChartSelector = ({ data, activeSheet }) => {
         )}
       </div>
       
-      {chartData.length > 0 && chartData.length < sheetData.length && (
-        <p className="text-xs text-gray-500 mt-2">
-          Note: Chart shows first 50 rows for performance
-        </p>
-      )}
+      
     </div>
   );
 };
