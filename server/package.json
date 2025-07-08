@@ -6,13 +6,17 @@
   "type": "commonjs",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start:gc": "node --expose-gc index.js",
+    "dev": "nodemon index.js",
+    "dev:gc": "nodemon --expose-gc index.js"
   },
   "dependencies": {
     "express": "^5.1.0",
     "mongoose": "^8.16.1",
     "cors": "^2.8.5",
-    "dotenv": "^17.0.0"
+    "dotenv": "^17.0.0",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0"
   },
   "engines": {
     "node": ">=18.0.0"
