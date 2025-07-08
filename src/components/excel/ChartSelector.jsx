@@ -12,8 +12,8 @@ const ChartSelector = ({ data, activeSheet }) => {
   const [chartData, setChartData] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-  const [startRow, setStartRow] = useState(1); // 1-based index for user
-  const [endRow, setEndRow] = useState(50); // 1-based index for user
+  const [startRow, setStartRow] = useState(1);
+  const [endRow, setEndRow] = useState(50);
   const [showSaveModal, setShowSaveModal] = useState(false);
 
   const trackRef = useRef(null);
