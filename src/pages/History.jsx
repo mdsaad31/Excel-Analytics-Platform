@@ -17,19 +17,12 @@ const History = () => {
   const fetchHistory = async () => {
     if (currentUser) {
       try {
-        console.log('Fetching history for user:', currentUser.sub);
-        console.log('API URL:', config.API_BASE_URL);
-        
         const response = await axios.get(`${config.API_BASE_URL}/history?user=${currentUser.sub}`);
-        console.log('Fetched history:', response.data);
-        
         // Sort by newest first (most recent upload date)
         const sortedHistory = response.data.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
         setHistory(sortedHistory);
       } catch (error) {
         console.error('Error fetching history:', error);
-        console.error('Response data:', error.response?.data);
-        console.error('Response status:', error.response?.status);
       } finally {
         setLoading(false);
       }
@@ -38,18 +31,11 @@ const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      console.log('Attempting to delete item with ID:', id);
-      console.log('API URL:', config.API_BASE_URL);
-      
-      const response = await axios.delete(`${config.API_BASE_URL}/history/${id}`);
-      console.log('Delete response:', response.data);
-      
+      await axios.delete(`${config.API_BASE_URL}/history/${id}`);
       setHistory(history.filter(item => item._id !== id));
     } catch (error) {
       console.error('Error deleting history entry:', error);
-      console.error('Response data:', error.response?.data);
-      console.error('Response status:', error.response?.status);
-      alert('Failed to delete item. Please check the console for details.');
+      alert('Failed to delete item. Please try again.');
     }
   };
 

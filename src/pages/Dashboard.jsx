@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import ExcelUploader from '../components/excel/ExcelUploader';
 import DataViewer from '../components/excel/DataViewer';
-import ApiTest from '../components/debug/ApiTest';
 
 const Dashboard = () => {
   const [excelData, setExcelData] = useState(null);
@@ -59,9 +58,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-      {/* Debug Panel - Remove this in production */}
-      <ApiTest />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Excel Data Explorer</h2>
