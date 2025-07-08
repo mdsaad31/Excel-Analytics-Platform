@@ -11,21 +11,19 @@ const ChartSelector = ({ data, activeSheet }) => {
   const [chartData, setChartData] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-  const [startRow, setStartRow] = useState(1); // 1-based index for user
-  const [endRow, setEndRow] = useState(50); // 1-based index for user
+  const [startRow, setStartRow] = useState(1);
+  const [endRow, setEndRow] = useState(50);
 
   const trackRef = useRef(null);
-  const activeThumbRef = useRef(null); // Reintroduce activeThumbRef
+  const activeThumbRef = useRef(null);
 
   const sheetData = data?.sheets?.[activeSheet] || [];
   const headers = data?.headers?.[activeSheet] || [];
 
-  // Refs for mutable values in useCallback
   const startRowRef = useRef(startRow);
   const endRowRef = useRef(endRow);
   const sheetDataLengthRef = useRef(sheetData.length);
 
-  // Update refs whenever state changes
   useEffect(() => { startRowRef.current = startRow; }, [startRow]);
   useEffect(() => { endRowRef.current = endRow; }, [endRow]);
   useEffect(() => { sheetDataLengthRef.current = sheetData.length; }, [sheetData.length]);
@@ -72,7 +70,6 @@ const ChartSelector = ({ data, activeSheet }) => {
     window.addEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove, handleMouseUp]);
 
-  // Touch event handlers
   const handleTouchMove = useCallback((e) => {
     console.log('handleTouchMove: activeThumbRef.current', activeThumbRef.current, 'trackRef.current', trackRef.current);
     if (!activeThumbRef.current || !trackRef.current) {
@@ -138,14 +135,12 @@ const ChartSelector = ({ data, activeSheet }) => {
       setYAxis([numericColumns[0]]);
     }
 
-    // Adjust endRow if it's greater than the actual data length
     if (sheetData.length > 0) {
       setEndRow(prevEndRow => Math.min(prevEndRow, sheetData.length));
     } else {
-      setEndRow(1); // If no data, set endRow to 1
+      setEndRow(1);
     }
 
-    // Ensure startRow is not greater than endRow, and is at least 1
     setStartRow(prevStartRow => Math.min(prevStartRow, endRow || 1));
     setStartRow(prevStartRow => Math.max(1, prevStartRow));
 
@@ -168,7 +163,6 @@ const ChartSelector = ({ data, activeSheet }) => {
       return dataPoint;
     });
     
-    // Apply row selection, ensuring valid range
     const actualStartRow = Math.max(0, startRow - 1);
     const actualEndRow = Math.min(sheetData.length, endRow);
 
