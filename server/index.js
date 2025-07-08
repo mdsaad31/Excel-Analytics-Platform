@@ -46,7 +46,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
@@ -75,7 +76,9 @@ connection.on('error', (error) => {
 });
 
 const historyRouter = require('./routes/history');
+const savedChartsRouter = require('./routes/savedCharts');
 app.use('/history', historyRouter);
+app.use('/saved-charts', savedChartsRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });

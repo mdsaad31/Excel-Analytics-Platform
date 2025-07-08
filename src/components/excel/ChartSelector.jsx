@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart, Scatter, ScatterChart, Treemap, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { COLORS } from '../../data/mockData';
 import { exportChartAsPNG, exportChartAsPDF } from '../../utils/chartExport';
+import SaveChartModal from '../charts/SaveChartModal';
 
 const ChartSelector = ({ data, activeSheet }) => {
   const chartRef = useRef(null);
@@ -13,6 +14,8 @@ const ChartSelector = ({ data, activeSheet }) => {
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [startRow, setStartRow] = useState(1);
   const [endRow, setEndRow] = useState(50);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+
 
   const trackRef = useRef(null);
   const activeThumbRef = useRef(null);
@@ -536,6 +539,39 @@ const ChartSelector = ({ data, activeSheet }) => {
     }
   };
 
+  const handleSaveChart = () => {
+    if (!chartData.length) {
+      alert('No chart data to save. Please generate a chart first.');
+      return;
+    }
+    setShowSaveModal(true);
+  };
+
+  const handleSaveSuccess = (savedChart) => {
+    const successMsg = document.createElement('div');
+    successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+    successMsg.textContent = 'Chart saved successfully!';
+    document.body.appendChild(successMsg);
+    setTimeout(() => document.body.removeChild(successMsg), 3000);
+  };
+
+  const getCurrentChartData = () => {
+    const savedData = localStorage.getItem('lastExcelData');
+    const fileName = savedData ? JSON.parse(savedData).fileName : 'Unknown File';
+    
+    return {
+      chartType,
+      xAxis,
+      yAxis,
+      chartData,
+      colors: COLORS,
+      startRow,
+      endRow,
+      activeSheet,
+      fileName
+    };
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="mb-4">
@@ -544,6 +580,18 @@ const ChartSelector = ({ data, activeSheet }) => {
           
           {chartData.length > 0 && (
             <div className="flex space-x-2">
+              <button
+                onClick={handleSaveChart}
+                className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors flex items-center"
+                title="Save Chart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 12.586V5a1 1 0 10-2 0v7.586l-1.293-1.293z"/>
+                  <path d="M5 3a2 2 0 00-2 2v1a1 1 0 002 0V5h8v10H5v-1a1 1 0 00-2 0v1a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H5z"/>
+                </svg>
+                Save
+              </button>
+              
               <button
                 onClick={handleExportPNG}
                 disabled={isExporting}
@@ -702,6 +750,12 @@ const ChartSelector = ({ data, activeSheet }) => {
         )}
       </div>
       
+      <SaveChartModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        chartData={getCurrentChartData()}
+        onSaveSuccess={handleSaveSuccess}
+      />
       
     </div>
   );

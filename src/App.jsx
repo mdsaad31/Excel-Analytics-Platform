@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Analysis from './pages/Analysis';
 import History from './pages/History';
+import SavedCharts from './pages/SavedCharts';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout><History /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/saved-charts" 
+            element={
+              <ProtectedRoute>
+                <Layout><SavedCharts /></Layout>
               </ProtectedRoute>
             } 
           />
