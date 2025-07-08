@@ -48,7 +48,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Add request logging middleware
 app.use((req, res, next) => {
@@ -80,7 +81,9 @@ connection.on('error', (error) => {
 
 // Routes
 const historyRouter = require('./routes/history');
+const savedChartsRouter = require('./routes/savedCharts');
 app.use('/history', historyRouter);
+app.use('/saved-charts', savedChartsRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

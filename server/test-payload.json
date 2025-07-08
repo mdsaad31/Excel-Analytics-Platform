@@ -1,0 +1,11 @@
+{
+  "title": "Test Chart",
+  "chartType": "bar",
+  "chartConfig": {
+    "xAxis": "test",
+    "yAxis": ["data"],
+    "chartData": []
+  },
+  "fileName": "test.xlsx",
+  "user": "test-user"
+}
