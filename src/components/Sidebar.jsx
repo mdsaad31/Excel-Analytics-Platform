@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <Link
                   key={item.id}
                   to={item.path}
-                  onClick={toggleSidebar} // Close sidebar on navigation
+                  onClick={toggleSidebar}
                   className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${location.pathname === item.path ? 'bg-indigo-100 text-indigo-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                 >
                   <svg

@@ -17,7 +17,7 @@ const fileHistorySchema = new Schema({
     required: true,
   },
   user: {
-    type: String, // This will store the user's ID from Auth0
+    type: String,
     required: true,
   },
 }, { timestamps: true });
