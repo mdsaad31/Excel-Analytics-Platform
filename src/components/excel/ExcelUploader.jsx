@@ -46,7 +46,18 @@ const ExcelUploader = ({ onDataParsed }) => {
           user: currentUser.sub,
         };
 
-        await axios.post(`${config.API_BASE_URL}/history/add`, historyData);
+        console.log('Sending history data:', historyData);
+        console.log('API URL:', config.API_BASE_URL);
+        
+        try {
+          const response = await axios.post(`${config.API_BASE_URL}/history/add`, historyData);
+          console.log('History save response:', response.data);
+        } catch (historyError) {
+          console.error('Error saving to history:', historyError);
+          console.error('Response data:', historyError.response?.data);
+          console.error('Response status:', historyError.response?.status);
+          // Don't throw this error as the file parsing was successful
+        }
       }
 
     } catch (err) {
