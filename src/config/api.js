@@ -1,4 +1,3 @@
-// API configuration for different environments
 const config = {
   development: {
     API_BASE_URL: 'http://localhost:5000',

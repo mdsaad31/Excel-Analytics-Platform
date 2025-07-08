@@ -11,17 +11,15 @@ if (process.env.NODE_ENV !== 'production') {
 const app = express();
 const port = process.env.PORT || 5000;
 
-// CORS configuration for production
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     const allowedOrigins = process.env.NODE_ENV === 'production' 
       ? [
           process.env.FRONTEND_URL, 
           'https://excel-analytics-frontend.onrender.com',
-          /\.onrender\.com$/  // Allow any onrender.com subdomain
+          /\.onrender\.com$/
         ]
       : ['http://localhost:3000', 'http://localhost:5173'];
     
@@ -51,13 +49,11 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Add request logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
   next();
 });
 
-// MongoDB connection
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
@@ -79,13 +75,11 @@ connection.on('error', (error) => {
   console.error('MongoDB connection error:', error);
 });
 
-// Routes
 const historyRouter = require('./routes/history');
 const savedChartsRouter = require('./routes/savedCharts');
 app.use('/history', historyRouter);
 app.use('/saved-charts', savedChartsRouter);
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
