@@ -9,9 +9,4 @@ const config = {
 
 const environment = import.meta.env.MODE || 'development';
 
-// Log the configuration for debugging
-console.log('Environment:', environment);
-console.log('API Base URL:', config[environment].API_BASE_URL);
-console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
-
 export default config[environment];
