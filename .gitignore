@@ -15,7 +15,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-SAVED_CHARTS_FEATURE.md
 .idea
 .env
 .env*
@@ -25,3 +24,14 @@ SAVED_CHARTS_FEATURE.md
 *.njsproj
 *.sln
 *.sw?
+
+
+# Documentation files
+SAVED_CHARTS_FEATURE.md
+KEEP_ALIVE_SETUP.md
+KEEP_ALIVE_IMPLEMENTATION.md
+QUICK_SETUP_REFERENCE.md
+STEP_BY_STEP_SETUP.md
+SETTINGS_AND_PROFILE_DOCUMENTATION.md
+FEATURES_IMPLEMENTED.md
+COMPLETE_FILE_STORAGE_FEATURE.md

@@ -39,6 +39,44 @@ const History = () => {
     }
   };
 
+  const handleDownload = async (id, fileName) => {
+    try {
+      const response = await axios.get(`${config.API_BASE_URL}/history/${id}/download`, {
+        responseType: 'blob',
+      });
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file. Please try again.');
+    }
+  };
+
+  const handleViewData = async (id) => {
+    try {
+      const response = await axios.get(`${config.API_BASE_URL}/history/${id}/data`);
+      
+      // Navigate to dashboard with parsed data
+      navigate('/dashboard', { 
+        state: { 
+          parsedData: response.data.parsedData,
+          fileName: response.data.fileName 
+        } 
+      });
+    } catch (error) {
+      console.error('Error fetching parsed data:', error);
+      alert('Failed to load file data. Please try again.');
+    }
+  };
+
   const formatDateTimeIndian = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -50,8 +88,21 @@ const History = () => {
     return `${day}/${month}/${year} at ${hours}:${minutes}`;
   };
 
-  const handleReuse = (fileName) => {
-    navigate('/dashboard', { state: { fileName: fileName } });
+  const handleReuse = async (id) => {
+    try {
+      const response = await axios.get(`${config.API_BASE_URL}/history/${id}/data`);
+      
+      // Navigate to analysis page with parsed data (Reuse functionality)
+      navigate('/analysis', { 
+        state: { 
+          parsedData: response.data.parsedData,
+          fileName: response.data.fileName 
+        } 
+      });
+    } catch (error) {
+      console.error('Error fetching parsed data:', error);
+      alert('Failed to load file data. Please try again.');
+    }
   };
 
   if (loading) {
@@ -79,6 +130,9 @@ const History = () => {
                     Size
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Data Available
+                  </th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -95,21 +149,66 @@ const History = () => {
                       </p>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{item.size}</p>
+                      <div className="flex flex-col">
+                        <p className="text-gray-900 whitespace-no-wrap">{item.size}</p>
+                        {item.originalSize && item.originalSize > 1024 * 1024 && (
+                          <span className="text-xs text-amber-600">
+                            File too large (&gt;{((item.originalSize / (1024 * 1024)).toFixed(2))}MB)
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <button
-                        onClick={() => handleDelete(item._id)}
-                        className="text-red-600 hover:text-red-900 mr-3"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => handleReuse(item.fileName)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Reuse
-                      </button>
+                      <div className="flex flex-col">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          item.fileContent ? 'bg-green-100 text-green-800' : 
+                          item.originalSize && item.originalSize > 1024 * 1024 ? 'bg-amber-100 text-amber-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {item.fileContent ? 'Complete File' : 
+                           item.originalSize && item.originalSize > 1024 * 1024 ? 'Size Limited' : 
+                           'Metadata Only'}
+                        </span>
+                        {item.parsedData && (
+                          <span className="text-xs text-gray-500 mt-1">
+                            {Object.keys(item.parsedData.sheets || {}).length} sheets
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="text-red-600 hover:text-red-900 text-sm"
+                        >
+                          Delete
+                        </button>
+                        {item.parsedData && (
+                          <button
+                            onClick={() => handleReuse(item._id)}
+                            className="text-blue-600 hover:text-blue-900 text-sm"
+                          >
+                            Reuse
+                          </button>
+                        )}
+                        {item.fileContent && (
+                          <button
+                            onClick={() => handleDownload(item._id, item.fileName)}
+                            className="text-green-600 hover:text-green-900 text-sm"
+                          >
+                            Download
+                          </button>
+                        )}
+                        {item.parsedData && (
+                          <button
+                            onClick={() => handleViewData(item._id)}
+                            className="text-purple-600 hover:text-purple-900 text-sm"
+                          >
+                            View Data
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -117,8 +216,8 @@ const History = () => {
             </table>
           </div>
         </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

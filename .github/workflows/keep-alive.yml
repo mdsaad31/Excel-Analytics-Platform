@@ -1,0 +1,65 @@
+name: Keep Server Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Ping Server
+      run: |
+        echo "Pinging server to keep it alive..."
+        
+        # Replace with your actual server URL
+        SERVER_URL="${{ secrets.SERVER_URL || 'https://your-render-app.onrender.com' }}"
+        
+        # Ping the health endpoint
+        response=$(curl -s -o /dev/null -w "%{http_code}" "$SERVER_URL/health" --max-time 30)
+        
+        if [ $response -eq 200 ]; then
+          echo "✅ Server is alive and responding (HTTP $response)"
+        else
+          echo "❌ Server responded with HTTP $response"
+          exit 1
+        fi
+        
+    - name: Ping Alternative Endpoint
+      run: |
+        echo "Pinging alternative endpoint..."
+        
+        SERVER_URL="${{ secrets.SERVER_URL || 'https://your-render-app.onrender.com' }}"
+        
+        # Ping the basic ping endpoint
+        response=$(curl -s -o /dev/null -w "%{http_code}" "$SERVER_URL/ping" --max-time 30)
+        
+        if [ $response -eq 200 ]; then
+          echo "✅ Alternative endpoint is responding (HTTP $response)"
+        else
+          echo "⚠️ Alternative endpoint responded with HTTP $response"
+        fi
+        
+    - name: Check Keep-Alive Status
+      run: |
+        echo "Checking keep-alive service status..."
+        
+        SERVER_URL="${{ secrets.SERVER_URL || 'https://your-render-app.onrender.com' }}"
+        
+        # Check keep-alive status
+        status=$(curl -s "$SERVER_URL/health/keep-alive/status" --max-time 30)
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Keep-alive status retrieved successfully"
+          echo "$status" | jq . 2>/dev/null || echo "$status"
+        else
+          echo "⚠️ Could not retrieve keep-alive status"
+        fi
+
+    - name: Log Completion
+      run: |
+        echo "Keep-alive ping completed at $(date)"
+        echo "Next ping scheduled in 10 minutes"

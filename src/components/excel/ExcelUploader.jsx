@@ -39,18 +39,67 @@ const ExcelUploader = ({ onDataParsed }) => {
       onDataParsed(parsedData);
 
       if (currentUser) {
-        const historyData = {
-          fileName: selectedFile.name,
-          uploadDate: new Date(),
-          size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
-          user: currentUser.sub,
-        };
+        // Check file size (1MB = 1024 * 1024 bytes)
+        const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+        const fileSizeInMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
         
-        try {
-          await axios.post(`${config.API_BASE_URL}/history/add`, historyData);
-        } catch (historyError) {
-          console.error('Error saving to history:', historyError);
-          // Don't throw this error as the file parsing was successful
+        // Create a file hash for duplicate detection
+        const fileHash = await generateFileHash(selectedFile);
+        
+        // Check if file already exists
+        const existingFile = await checkFileExists(fileHash, currentUser.sub);
+        
+        if (existingFile) {
+          // File already exists, just update the upload date
+          const updateData = {
+            uploadDate: new Date(),
+          };
+          
+          try {
+            await axios.put(`${config.API_BASE_URL}/history/${existingFile._id}`, updateData);
+            setError(''); // Clear any previous errors
+            alert(`File already exists! Linked to existing file uploaded on ${new Date(existingFile.uploadDate).toLocaleDateString()}`);
+          } catch (updateError) {
+            console.error('Error updating existing file:', updateError);
+            // Continue with normal upload if update fails
+          }
+        } else {
+          // New file, proceed with upload
+          let fileContent = null;
+          
+          if (selectedFile.size > MAX_FILE_SIZE) {
+            setError(`File size (${fileSizeInMB} MB) exceeds the 1MB limit. Only metadata will be stored.`);
+            // Don't return here, continue with metadata-only storage
+          } else {
+            // Convert file to base64 for storage
+            const fileReader = new FileReader();
+            const fileContentPromise = new Promise((resolve, reject) => {
+              fileReader.onload = (e) => resolve(e.target.result);
+              fileReader.onerror = reject;
+              fileReader.readAsDataURL(selectedFile);
+            });
+
+            fileContent = await fileContentPromise;
+          }
+
+          const historyData = {
+            fileName: selectedFile.name,
+            uploadDate: new Date(),
+            size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+            user: currentUser.sub,
+            fileContent: fileContent, // Base64 encoded file content (null if too large)
+            parsedData: parsedData, // Parsed Excel data
+            fileType: selectedFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            originalSize: selectedFile.size,
+            fileHash: fileHash, // Add file hash for duplicate detection
+          };
+          
+          try {
+            await axios.post(`${config.API_BASE_URL}/history/add`, historyData);
+          } catch (historyError) {
+            console.error('Error saving to history:', historyError);
+            // Don't throw this error as the file parsing was successful
+          }
         }
       }
 
@@ -76,6 +125,27 @@ const ExcelUploader = ({ onDataParsed }) => {
       }
       setSelectedFile(file);
       setError('');
+    }
+  };
+
+  // Helper function to generate file hash for duplicate detection
+  const generateFileHash = async (file) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  // Helper function to check if file already exists
+  const checkFileExists = async (fileHash, userId) => {
+    try {
+      const response = await axios.get(`${config.API_BASE_URL}/history/check-duplicate`, {
+        params: { fileHash, user: userId }
+      });
+      return response.data.exists ? response.data.file : null;
+    } catch (error) {
+      console.error('Error checking file existence:', error);
+      return null;
     }
   };
 
@@ -118,8 +188,15 @@ const ExcelUploader = ({ onDataParsed }) => {
         </p>
         
         <p className="mt-1 text-xs text-gray-500">
-          Supports .xlsx, .xls, .csv files
+          Supports .xlsx, .xls, .csv files (max 1MB for complete storage)
         </p>
+        
+        {selectedFile && selectedFile.size > 1024 * 1024 && (
+          <div className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+            <strong>Note:</strong> File size ({(selectedFile.size / (1024 * 1024)).toFixed(2)}MB) exceeds 1MB limit. 
+            Only metadata and parsed data will be stored.
+          </div>
+        )}
       </div>
 
       {error && (

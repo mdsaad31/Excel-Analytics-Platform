@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import ChartSelector from '../components/excel/ChartSelector';
 import DataViewer from '../components/excel/DataViewer';
@@ -9,8 +9,23 @@ const Analysis = () => {
   const [activeSheet, setActiveSheet] = useState('');
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
+    // Check if parsed data was passed from history (for Reuse button)
+    if (location.state && location.state.parsedData) {
+      setExcelData(location.state.parsedData);
+      if (location.state.parsedData.firstSheet) {
+        setActiveSheet(location.state.parsedData.firstSheet);
+      }
+      // Store in localStorage for consistency
+      localStorage.setItem('lastExcelData', JSON.stringify(location.state.parsedData));
+      // Clear the state after using it
+      navigate(location.pathname, { replace: true, state: {} });
+      return;
+    }
+
+    // Otherwise, load from localStorage
     const loadSavedData = () => {
       try {
         const savedData = localStorage.getItem('lastExcelData');
@@ -30,7 +45,7 @@ const Analysis = () => {
     };
 
     loadSavedData();
-  }, [navigate]);
+  }, [location, navigate]);
 
   const goToDashboard = () => {
     navigate('/dashboard');
@@ -54,7 +69,7 @@ const Analysis = () => {
             <h2 className="text-xl font-semibold text-gray-800">Visualization Tools</h2>
             <button
               onClick={goToDashboard}
-              className="flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 border-blue-600 transition ease-in-out duration-150"
+              className="flex items-center px-4 py-2 border border-blue-600 text-sm leading-5 font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition ease-in-out duration-150"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />

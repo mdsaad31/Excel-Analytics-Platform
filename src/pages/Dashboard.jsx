@@ -14,6 +14,15 @@ const Dashboard = () => {
   const [reuseFileName, setReuseFileName] = useState(null);
 
   useEffect(() => {
+    // Check if parsed data was passed from history (for View Data button)
+    if (location.state && location.state.parsedData) {
+      handleDataParsed(location.state.parsedData);
+      // Clear the state after using it
+      navigate(location.pathname, { replace: true, state: {} });
+      return; // Don't process fileName if we have parsed data
+    }
+    
+    // Check if fileName was passed for reuse functionality
     if (location.state && location.state.fileName) {
       setReuseFileName(location.state.fileName);
       // Clear the state after using it to prevent message from reappearing on subsequent visits
