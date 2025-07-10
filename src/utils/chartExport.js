@@ -1,14 +1,16 @@
 import html2canvas from 'html2canvas';
 import { toPng, toSvg } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import NotificationUtil from './notificationUtil';
 
 /**
  * Export chart as PNG image
  * @param {string} elementId - ID of the chart container element
  * @param {string} fileName - Name for the downloaded file (without extension)
+ * @param {string} userId - User ID for notifications
  * @returns {Promise<void>}
  */
-export const exportChartAsPNG = async (elementId, fileName = 'chart') => {
+export const exportChartAsPNG = async (elementId, fileName = 'chart', userId = null) => {
   try {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -32,6 +34,11 @@ export const exportChartAsPNG = async (elementId, fileName = 'chart') => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Send download notification
+    if (userId) {
+      await NotificationUtil.sendChartDownloadNotification(userId, fileName, 'PNG');
+    }
   } catch (error) {
     console.error('Error exporting chart as PNG:', error);
     try {
@@ -66,7 +73,7 @@ export const exportChartAsPNG = async (elementId, fileName = 'chart') => {
  */
 export const exportChartAsPDF = async (elementId, fileName = 'chart', options = {}) => {
   try {
-    const { orientation = 'landscape', title = 'Chart Export' } = options;
+    const { orientation = 'landscape', title = 'Chart Export', userId = null } = options;
     
     const element = document.getElementById(elementId);
     if (!element) {
@@ -108,6 +115,11 @@ export const exportChartAsPDF = async (elementId, fileName = 'chart', options = 
     pdf.text(`Generated on: ${new Date().toLocaleString()}`, 15, pdfHeight + 35);
     
     pdf.save(`${fileName}.pdf`);
+
+    // Send download notification
+    if (userId) {
+      await NotificationUtil.sendChartDownloadNotification(userId, fileName, 'PDF');
+    }
   } catch (error) {
     console.error('Error exporting chart as PDF:', error);
     try {
@@ -138,6 +150,11 @@ export const exportChartAsPDF = async (elementId, fileName = 'chart', options = 
       pdf.setFontSize(10);
       pdf.text(`Generated on: ${new Date().toLocaleString()}`, 15, pdfHeight + 35);
       pdf.save(`${fileName}.pdf`);
+
+      // Send download notification
+      if (userId) {
+        await NotificationUtil.sendChartDownloadNotification(userId, fileName, 'PDF');
+      }
     } catch (fallbackError) {
       console.error('Fallback export also failed:', fallbackError);
       throw new Error('Both primary and fallback export methods failed');

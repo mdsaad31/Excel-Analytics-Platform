@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import api from '../../config/api';
+import NotificationUtil from '../../utils/notificationUtil';
 
 const SaveChartModal = ({ isOpen, onClose, chartData, onSaveSuccess }) => {
   const { currentUser } = useAuth();
@@ -94,6 +95,13 @@ const SaveChartModal = ({ isOpen, onClose, chartData, onSaveSuccess }) => {
       }
 
       const savedChart = await response.json();
+      
+      // Send chart save notification
+      await NotificationUtil.sendChartSaveNotification(
+        currentUser.sub,
+        formData.title.trim(),
+        chartData.chartType
+      );
       
       // Reset form
       setFormData({ title: '', tags: '', isPublic: false });

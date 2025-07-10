@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
 import { parseExcelFile } from './ExcelParser';
 import config from '../../config/api';
+import NotificationUtil from '../../utils/notificationUtil';
 
 const ExcelUploader = ({ onDataParsed }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,6 +38,11 @@ const ExcelUploader = ({ onDataParsed }) => {
     try {
       const parsedData = await parseExcelFile(selectedFile);
       onDataParsed(parsedData);
+
+      // Send file upload notification
+      if (currentUser) {
+        await NotificationUtil.sendFileUploadNotification(currentUser.sub, selectedFile.name, selectedFile.size);
+      }
 
       if (currentUser) {
         // Check file size (1MB = 1024 * 1024 bytes)
