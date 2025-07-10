@@ -1,0 +1,199 @@
+/* Header Component Styles */
+.header-dropdown {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.header-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+/* Profile Avatar Button */
+.profile-avatar-btn {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.profile-avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+.profile-avatar-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.profile-avatar-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+/* Menu Item Styles */
+.dropdown-menu-item {
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-menu-item:hover {
+  background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%);
+  transform: translateX(2px);
+}
+
+.dropdown-menu-item:active {
+  transform: translateX(1px) scale(0.98);
+}
+
+/* Profile Progress Bar */
+.profile-progress {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Email Truncation */
+.email-text {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  line-height: 1.2;
+}
+
+/* Improved dropdown spacing and sizing */
+.header-dropdown {
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.header-dropdown .px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Profile section improvements */
+.profile-section {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0; /* Important for text truncation */
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-email {
+  color: #6b7280;
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+/* Dark mode support for dropdown */
+@media (prefers-color-scheme: dark) {
+  .header-dropdown {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .header-dropdown::before {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .profile-name {
+    color: #f9fafb;
+  }
+  
+  .profile-email {
+    color: #9ca3af;
+  }
+  
+  .dropdown-menu-item:hover {
+    background: #374151;
+    color: #f9fafb;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .header-dropdown {
+    min-width: 300px;
+    max-width: 320px;
+    right: -16px;
+  }
+  
+  .profile-email {
+    max-width: 200px;
+  }
+  
+  .profile-name {
+    max-width: 200px;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .dropdown-menu-item:hover {
+    background: #000;
+    color: #fff;
+  }
+  
+  .profile-progress {
+    background: #000;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .header-dropdown,
+  .profile-avatar-btn,
+  .dropdown-menu-item,
+  .profile-progress {
+    animation: none;
+    transition: none;
+  }
+}
