@@ -53,7 +53,7 @@
   top: 100%;
   right: 0;
   width: 380px;
-  max-width: 90vw;
+  max-width: 95vw;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -352,6 +352,7 @@
 .dark .notification-dropdown {
   background: #1f2937;
   border-color: #374151;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
 }
 
 .dark .notification-dropdown::before {
@@ -361,6 +362,7 @@
 
 .dark .notification-header {
   border-color: #374151;
+  background: #1f2937;
 }
 
 .dark .notification-header h3 {
@@ -378,6 +380,7 @@
 
 .dark .notification-item {
   border-color: #374151;
+  background: #1f2937;
 }
 
 .dark .notification-item:hover {
@@ -385,7 +388,7 @@
 }
 
 .dark .notification-item.unread {
-  background-color: #451a03;
+  background-color: #422006;
   border-left-color: #f59e0b;
 }
 
@@ -407,6 +410,7 @@
 
 .dark .notification-action:hover {
   background: #312e81;
+  color: #a5b4fc;
 }
 
 .dark .notification-control-btn {
@@ -418,51 +422,92 @@
 .dark .notification-control-btn:hover {
   background: #4b5563;
   border-color: #6b7280;
+  color: #f3f4f6;
+}
+
+.dark .notification-empty {
+  color: #9ca3af;
+}
+
+.dark .notification-empty svg {
+  color: #6b7280;
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .notification-dropdown {
-    width: 95vw;
-    right: 2.5vw;
-    left: 2.5vw;
+    position: fixed;
+    top: 70px;
+    left: 16px;
+    right: 16px;
+    width: auto;
     max-width: none;
+    transform: none;
+    z-index: 9999;
   }
   
   .notification-dropdown::before {
-    right: 24px;
+    display: none;
   }
   
   .notification-item {
-    padding: 16px;
+    padding: 16px 12px;
+    border-bottom: 1px solid #e5e7eb;
   }
   
   .notification-content {
-    gap: 16px;
+    gap: 12px;
   }
   
   .notification-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    flex-shrink: 0;
   }
   
   .notification-title {
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.4;
   }
   
   .notification-message {
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.3;
   }
   
   .notification-controls {
     flex-direction: column;
     gap: 8px;
+    width: 100%;
   }
   
   .notification-control-btn {
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .notification-text {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .notification-time {
+    font-size: 11px;
+  }
+}
+
+/* Dark mode mobile fixes */
+@media (max-width: 768px) {
+  .dark .notification-dropdown {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .dark .notification-item {
+    border-bottom-color: #374151;
   }
 }
 

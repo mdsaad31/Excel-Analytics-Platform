@@ -132,30 +132,28 @@
   margin-bottom: 4px;
 }
 
-/* Dark mode support for dropdown */
-@media (prefers-color-scheme: dark) {
-  .header-dropdown {
-    background-color: #1f2937;
-    border-color: #374151;
-  }
-  
-  .header-dropdown::before {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .profile-name {
-    color: #f9fafb;
-  }
-  
-  .profile-email {
-    color: #9ca3af;
-  }
-  
-  .dropdown-menu-item:hover {
-    background: #374151;
-    color: #f9fafb;
-  }
+/* Dark mode support for dropdown - class-based theming */
+.dark .header-dropdown {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .header-dropdown::before {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .profile-name {
+  color: #f9fafb;
+}
+
+.dark .profile-email {
+  color: #9ca3af;
+}
+
+.dark .dropdown-menu-item:hover {
+  background: #374151;
+  color: #f9fafb;
 }
 
 /* Mobile responsiveness */

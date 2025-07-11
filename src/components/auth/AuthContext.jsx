@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import api from '../../config/api';
 
@@ -10,13 +10,24 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const { user, loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
-  // Send welcome notification when user logs in
+  // Send welcome notification when user logs in (not on page reload)
   useEffect(() => {
-    if (isAuthenticated && user) {
-      sendWelcomeNotification(user);
+    if (isAuthenticated && user && !hasShownWelcome) {
+      // Check if this is a fresh login vs page reload
+      const lastLoginTime = sessionStorage.getItem(`lastLogin_${user.sub}`);
+      const currentTime = new Date().getTime();
+      const fiveMinutesAgo = currentTime - (5 * 60 * 1000);
+      
+      // Only send welcome if no recent login recorded or it's been more than 5 minutes
+      if (!lastLoginTime || parseInt(lastLoginTime) < fiveMinutesAgo) {
+        sendWelcomeNotification(user);
+        setHasShownWelcome(true);
+        sessionStorage.setItem(`lastLogin_${user.sub}`, currentTime.toString());
+      }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, hasShownWelcome]);
 
   const sendWelcomeNotification = async (user) => {
     try {

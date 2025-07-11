@@ -109,6 +109,27 @@
   transform: scale(1.05);
 }
 
+/* Avatar Selector Modal Improvements */
+.avatar-selector-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.avatar-selector-btn:hover {
+  transform: scale(1.1);
+}
+
+.avatar-selector-btn:active {
+  transform: scale(0.95);
+}
+
 .profile-completeness {
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   height: 8px;
@@ -200,19 +221,66 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .settings-container {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   .settings-header {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .settings-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .avatar-grid {
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+  }
+  
+  /* Avatar Modal Mobile Styles */
+  .avatar-selector-btn {
+    padding: 2px;
+  }
+  
+  /* Make save button more prominent on mobile */
+  .mobile-save-btn {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem;
+    margin: -1rem -1rem 0 -1rem;
+    z-index: 10;
+  }
+  
+  /* Grid layout adjustments */
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .settings-sidebar {
+    order: -1;
+  }
+  
+  .settings-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 0.5rem;
+    padding: 0 1rem;
+  }
+  
+  .settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .settings-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
   }
 }
 

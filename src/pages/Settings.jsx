@@ -174,8 +174,13 @@ const Settings = () => {
     const { emoji, gradient } = parseAvatar(avatar);
     return (
       <div 
-        className={`${size} rounded-full flex items-center justify-center text-white font-bold text-xl`}
-        style={{ background: gradient }}
+        className={`${size} rounded-full flex items-center justify-center text-white font-bold shadow-lg`}
+        style={{ 
+          background: gradient,
+          fontSize: size.includes('w-20') ? '28px' : 
+                    size.includes('w-16') ? '24px' :
+                    size.includes('w-12') ? '20px' : '16px'
+        }}
       >
         {emoji}
       </div>
@@ -198,41 +203,42 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <AvatarDisplay avatar={profile?.avatar} size="w-16 h-16" />
-                    <div>
-                      <h1 className="text-2xl font-bold text-gray-900">{profile?.nickname}</h1>
-                      <p className="text-gray-600">{currentUser?.email}</p>
-                      <div className="flex items-center mt-2">
-                        <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
-                          <div 
-                            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${profile?.profileCompleteness || 0}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm text-gray-500">{profile?.profileCompleteness || 0}% complete</span>
-                      </div>
-                    </div>
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <AvatarDisplay avatar={profile?.avatar} size="w-16 h-16" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{profile?.nickname}</h1>
+                <p className="text-gray-600">{currentUser?.email}</p>
+                <div className="flex items-center mt-2">
+                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                    <div 
+                      className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${profile?.profileCompleteness || 0}%` }}
+                    ></div>
                   </div>
-                  <div className="flex flex-col space-y-2">
-                    {successMessage && (
-                      <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
-                        {successMessage}
-                      </div>
-                    )}
-                    <button
-                      onClick={handleSave}
-                      disabled={saving}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                  </div>
+                  <span className="text-sm text-gray-500">{profile?.profileCompleteness || 0}% complete</span>
                 </div>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-2 lg:items-end w-full lg:w-auto">
+              {successMessage && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded w-full lg:w-auto">
+                  {successMessage}
+                </div>
+              )}
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full lg:w-auto"
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -559,37 +565,51 @@ const Settings = () => {
 
       {/* Avatar Selection Modal */}
       {showAvatarModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">Choose Your Avatar</h3>
-              <button
-                onClick={() => setShowAvatarModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 rounded-t-xl">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Choose Your Avatar</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Select an emoji and background that represents you</p>
+                </div>
+                <button
+                  onClick={() => setShowAvatarModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
             
-            <div className="grid grid-cols-8 gap-3">
-              {availableAvatars.map((avatar, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    handleInputChange('avatar', avatar);
-                    setShowAvatarModal(false);
-                  }}
-                  className={`p-1 rounded-lg border-2 transition-all ${
-                    profile?.avatar === avatar
-                      ? 'border-indigo-500 bg-indigo-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <AvatarDisplay avatar={avatar} size="w-12 h-12" />
-                </button>
-              ))}
+            <div className="p-6">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3">
+                {availableAvatars.map((avatar, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      handleInputChange('avatar', avatar);
+                      setShowAvatarModal(false);
+                    }}
+                    className={`avatar-selector-btn relative group transition-all duration-200 rounded-xl ${
+                      profile?.avatar === avatar
+                        ? 'ring-4 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 scale-105'
+                        : 'hover:scale-110 hover:shadow-lg'
+                    }`}
+                  >
+                    <AvatarDisplay avatar={avatar} size="w-14 h-14" />
+                    {profile?.avatar === avatar && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
