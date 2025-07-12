@@ -128,6 +128,13 @@ const userProfileSchema = new Schema({
     },
   },
   
+  // Skills
+  skills: [{
+    type: String,
+    trim: true,
+    maxLength: 50,
+  }],
+  
   // Preferences
   preferences: {
     theme: {

@@ -6,6 +6,7 @@ import Login from './components/auth/Login';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Analysis from './pages/Analysis';
+import Explore from './pages/Explore';
 import History from './pages/History';
 import SavedCharts from './pages/SavedCharts';
 import Settings from './pages/Settings';
@@ -49,6 +50,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout><Analysis /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/explore" 
+            element={
+              <ProtectedRoute>
+                <Layout><Explore /></Layout>
               </ProtectedRoute>
             } 
           />

@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const UserProfile = require('../models/userProfile.model');
 
-// Helper function to generate random nickname
 const generateRandomNickname = () => {
   const adjectives = [
     'Awesome', 'Creative', 'Dynamic', 'Energetic', 'Fantastic', 'Genuine', 'Happy', 'Innovative',
@@ -21,7 +20,6 @@ const generateRandomNickname = () => {
   return `${randomAdjective}${randomNoun}${randomNumber}`;
 };
 
-// Helper function to generate random avatar
 const generateRandomAvatar = () => {
   const emojis = [
     '💻', '⚡', '🚀', '📊', '�', '📉', '�', '🔧', '⚙️', '🛠️', '🔬', '🧪', '📱', '💡',
@@ -58,13 +56,11 @@ const generateRandomAvatar = () => {
   return `${randomEmoji}|${randomGradient}`;
 };
 
-// Get user profile
 router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     let profile = await UserProfile.findOne({ userId });
     
-    // If profile doesn't exist, create one with random avatar and nickname
     if (!profile) {
       profile = new UserProfile({
         userId,
@@ -87,18 +83,15 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-// Update user profile
 router.put('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const updateData = req.body;
     
-    // Validate required fields
     if (updateData.nickname && updateData.nickname.trim().length === 0) {
       return res.status(400).json({ error: 'Nickname cannot be empty' });
     }
     
-    // Check if nickname is already taken (excluding current user)
     if (updateData.nickname) {
       const existingProfile = await UserProfile.findOne({ 
         nickname: updateData.nickname, 
@@ -110,7 +103,6 @@ router.put('/:userId', async (req, res) => {
       }
     }
     
-    // Update last active timestamp
     updateData.lastActive = new Date();
     
     const profile = await UserProfile.findOneAndUpdate(
@@ -123,7 +115,6 @@ router.put('/:userId', async (req, res) => {
       return res.status(404).json({ error: 'User profile not found' });
     }
     
-    // Recalculate profile completeness
     profile.calculateCompleteness();
     await profile.save();
     
@@ -137,7 +128,6 @@ router.put('/:userId', async (req, res) => {
   }
 });
 
-// Check nickname availability
 router.post('/check-nickname', async (req, res) => {
   try {
     const { nickname, userId } = req.body;
@@ -167,7 +157,6 @@ router.post('/check-nickname', async (req, res) => {
   }
 });
 
-// Get random avatar
 router.get('/avatar/random', (req, res) => {
   try {
     const randomAvatar = generateRandomAvatar();
@@ -181,14 +170,12 @@ router.get('/avatar/random', (req, res) => {
   }
 });
 
-// Get random nickname
 router.get('/nickname/random', async (req, res) => {
   try {
     let nickname;
     let isUnique = false;
     let attempts = 0;
     
-    // Try to generate a unique nickname
     while (!isUnique && attempts < 10) {
       nickname = generateRandomNickname();
       const existingProfile = await UserProfile.findOne({ nickname });
@@ -196,7 +183,6 @@ router.get('/nickname/random', async (req, res) => {
       attempts++;
     }
     
-    // If still not unique, add timestamp
     if (!isUnique) {
       nickname = `${nickname}_${Date.now()}`;
     }
@@ -211,13 +197,12 @@ router.get('/nickname/random', async (req, res) => {
   }
 });
 
-// Get all available avatars
 router.get('/avatars/all', (req, res) => {
   try {
     const emojis = [
-      '💻', '⚡', '🚀', '📊', '�', '📉', '�', '🔧', '⚙️', '🛠️', '🔬', '🧪', '📱', '💡',
-      '🔍', '📋', '📌', '📎', '🔗', '�', '�', '📀', '🖥️', '⌨️', '🖱️', '📟', '☁️', '�',
-      '🔐', '🔑', '🗝️', '�', '🧩', '�', '🕹️', '�', '📻', '⏰', '⏱️', '⏲️', '�', '🔌'
+      '💻', '⚡', '🚀', '📊', '👩‍💻', '📉', '🛜', '🔧', '⚙️', '🛠️', '🔬', '🧪', '📱', '💡',
+      '🔍', '📋', '📌', '📎', '🔗', '🚆', '🌐', '📀', '🖥️', '⌨️', '🖱️', '📟', '☁️', '🛰️',
+      '🔐', '🔑', '🗝️', '📡', '🧩', '🪐', '🕹️', '�', '📻', '⏰', '⏱️', '⏲️', '🔔', '🔌'
     ];
     
     const gradients = [
@@ -280,6 +265,69 @@ router.delete('/:userId', async (req, res) => {
       error: 'Failed to delete user profile', 
       details: error.message 
     });
+  }
+});
+
+// Development route to create sample user profiles (remove in production)
+router.post('/create-sample-users', async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Sample creation not allowed in production' });
+  }
+
+  try {
+    const sampleUsers = [
+      {
+        userId: 'sample_user_1',
+        nickname: 'DataMaster2024',
+        avatar: '📊|linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        bio: 'Senior Data Analyst with 8+ years of experience in business intelligence and data visualization.',
+        email: 'datamaster@example.com',
+        jobTitle: 'Senior Data Analyst',
+        company: 'Analytics Corp',
+        location: 'San Francisco, CA',
+        skills: ['Data Analysis', 'SQL', 'Python', 'Tableau', 'Power BI', 'Excel', 'R', 'Statistics'],
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/datamaster',
+          github: 'https://github.com/datamaster'
+        }
+      },
+      {
+        userId: 'sample_user_2',
+        nickname: 'WebAnalyticsPro',
+        avatar: '📈|linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        bio: 'Digital marketing analyst specializing in web analytics and conversion optimization.',
+        email: 'webanalytics@example.com',
+        jobTitle: 'Digital Marketing Analyst',
+        company: 'TechStart Inc',
+        location: 'New York, NY',
+        skills: ['Google Analytics', 'SEO', 'SEM', 'JavaScript', 'GTM', 'A/B Testing', 'Conversion Optimization'],
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/webanalytics',
+          twitter: 'https://twitter.com/webanalytics'
+        }
+      },
+      {
+        userId: 'sample_user_3',
+        nickname: 'MarketResearcher',
+        avatar: '🔍|linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        bio: 'Market research specialist with expertise in competitive analysis and industry trends.',
+        email: 'market@example.com',
+        jobTitle: 'Market Research Analyst',
+        company: 'Research Solutions Ltd',
+        location: 'London, UK',
+        skills: ['Market Research', 'Competitive Analysis', 'SPSS', 'Survey Design', 'Data Mining', 'Excel', 'PowerPoint'],
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/marketresearcher',
+          website: 'https://marketresearch.example.com'
+        }
+      }
+    ];
+
+    const createdUsers = await UserProfile.insertMany(sampleUsers);
+    res.json({ message: 'Sample users created successfully', count: createdUsers.length });
+  } catch (error) {
+    console.error('Error creating sample users:', error);
+    res.status(500).json({ error: 'Failed to create sample users' });
   }
 });
 

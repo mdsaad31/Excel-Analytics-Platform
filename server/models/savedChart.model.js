@@ -44,6 +44,13 @@ const savedChartSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  likes: [{
+    type: String, // User IDs who liked this chart
+  }],
+  downloads: {
+    type: Number,
+    default: 0,
+  },
 }, { timestamps: true });
 
 // Index for faster queries
