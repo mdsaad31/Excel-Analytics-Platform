@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const UserProfile = require('../models/userProfile.model');
+const checkJwt = require('../middleware/auth');
 
 const generateRandomNickname = () => {
   const adjectives = [
@@ -56,9 +57,12 @@ const generateRandomAvatar = () => {
   return `${randomEmoji}|${randomGradient}`;
 };
 
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', checkJwt, async (req, res) => {
   try {
     const { userId } = req.params;
+    if (req.auth.payload.sub !== userId) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     let profile = await UserProfile.findOne({ userId });
     
     if (!profile) {
@@ -83,9 +87,12 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-router.put('/:userId', async (req, res) => {
+router.put('/:userId', checkJwt, async (req, res) => {
   try {
     const { userId } = req.params;
+    if (req.auth.payload.sub !== userId) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const updateData = req.body;
     
     if (updateData.nickname && updateData.nickname.trim().length === 0) {

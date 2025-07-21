@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import api from '../../config/api';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -9,8 +10,33 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const { user, loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
+  const { user, loginWithRedirect, logout, isAuthenticated, isLoading: auth0Loading, getAccessTokenSilently } = useAuth0();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isAuthenticated && user) {
+        try {
+          const token = await getAccessTokenSilently();
+          const response = await axios.get(`${api.API_BASE_URL}/user-profile/${user.sub}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setCurrentUser({ ...user, ...response.data });
+        } catch (error) {
+          console.error('Failed to fetch user profile', error);
+          setCurrentUser(user); // Fallback to auth0 user
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (!auth0Loading) {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [isAuthenticated, user, auth0Loading, getAccessTokenSilently]);
 
   // Send welcome notification when user logs in (not on page reload)
   useEffect(() => {
@@ -61,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
-    currentUser: user,
+    currentUser,
     login: loginWithRedirect,
     logout: () => logout({ logoutParams: { returnTo: window.location.origin } }),
     isAuthenticated,

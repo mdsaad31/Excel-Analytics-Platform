@@ -84,12 +84,14 @@ const savedChartsRouter = require('./routes/savedCharts');
 const healthRouter = require('./routes/health');
 const userProfileRouter = require('./routes/userProfile');
 const notificationsRouter = require('./routes/notifications');
+const adminRouter = require('./routes/admin');
 
 app.use('/history', historyRouter);
 app.use('/saved-charts', savedChartsRouter);
 app.use('/health', healthRouter);
 app.use('/user-profile', userProfileRouter);
 app.use('/notifications', notificationsRouter);
+app.use('/admin', adminRouter);
 
 // Legacy health endpoint for backward compatibility
 app.get('/ping', (req, res) => {
