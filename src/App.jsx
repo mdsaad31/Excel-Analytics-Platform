@@ -10,7 +10,9 @@ import Explore from './pages/Explore';
 import History from './pages/History';
 import SavedCharts from './pages/SavedCharts';
 import Settings from './pages/Settings';
+import AdminDashboard from './pages/AdminDashboard';
 import Layout from './components/Layout';
+import AdminRoute from './components/auth/AdminRoute';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -84,6 +86,14 @@ function App() {
                 <Layout><Settings /></Layout>
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <Layout><AdminDashboard /></Layout>
+              </AdminRoute>
+            }
           />
           
           {/* Fallback route - redirect to homepage */}

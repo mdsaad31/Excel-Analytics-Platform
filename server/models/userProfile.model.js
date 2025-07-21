@@ -226,6 +226,11 @@ const userProfileSchema = new Schema({
     min: 0,
     max: 100,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
 }, { 
   timestamps: true,
   toJSON: { virtuals: true },
