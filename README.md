@@ -106,7 +106,7 @@ The backend exposes RESTful endpoints for file history, notifications, saved cha
 
 ## Code Analysis
 
-This project includes a comprehensive code analysis tool that provides insights about the codebase.
+This project includes a comprehensive code analysis tool that provides deep insights about code quality, complexity, security, and maintainability.
 
 ### Running Code Analysis
 
@@ -120,53 +120,127 @@ pnpm run analyze
 
 ### What It Analyzes
 
-The code analysis tool provides the following metrics:
+The code analysis tool provides comprehensive metrics across multiple dimensions:
 
-- **File Statistics**: Total files, lines of code, code size
+#### 📊 Quality Score
+- **Overall Quality Score (0-100)**: Calculated based on complexity, comments, technical debt, duplication, and security issues
+
+#### 📈 Code Metrics
+- **File Statistics**: Total files, lines (code/comments/blank), code size
 - **File Distribution**: Breakdown by file type and directory
-- **Largest Files**: Top 10 largest files by lines and size
-- **Dependencies**: Frontend and backend dependency counts
-- **Code Organization**: Components, routes, models, and utility files count
-- **ESLint Results**: Code quality issues detected by ESLint
+- **Largest Files**: Top 10 largest files with detailed breakdowns
+- **Comments Ratio**: Percentage of comments vs. code lines
+
+#### 🧮 Complexity Analysis
+- **Cyclomatic Complexity**: Measures code complexity using decision points
+- **Complexity Distribution**: Files categorized by complexity level (Low/Medium/High/Very High)
+- **High Complexity Files**: Top 10 most complex files identified for refactoring
+
+#### 💰 Technical Debt
+- **TODO/FIXME/HACK Detection**: Tracks technical debt markers in code
+- **Deprecated Code**: Identifies deprecated functions and components
+- **Debt Locations**: Shows exact file and line numbers for each marker
+
+#### 👯 Code Duplication
+- **Duplication Ratio**: Percentage of duplicated code
+- **Duplicate Blocks**: Identifies repeated code blocks across files
+- **Duplication Locations**: Shows where code is duplicated
+
+#### 🔗 Import Analysis
+- **Import Statistics**: Total, external, and internal imports
+- **Most Imported Files**: Identifies heavily-used utility files and components
+- **Dependency Graph**: Tracks import relationships
+
+#### 🔒 Security Analysis
+- **Vulnerability Scanning**: Detects potential security issues
+- **Severity Levels**: Critical, High, Medium, Low risk categorization
+- **Common Issues**: eval() usage, XSS vulnerabilities, hardcoded secrets, console.log in production
+
+#### 📦 Dependencies
+- **Frontend & Backend**: Separate dependency analysis
+- **Package Counts**: Dependencies and devDependencies breakdown
+
+#### 🏗️ Code Organization
+- **Components**: React component count and listing
+- **API Routes**: Backend route analysis
+- **Database Models**: Model structure overview
+- **Utility Files**: Helper and utility modules
+
+#### 🔎 ESLint Integration
+- **Linting Results**: Automated code quality checks
+- **Error Detection**: Syntax and style issues
 
 ### Output
 
 The analysis tool generates:
-1. **Console Report**: Formatted output in the terminal
-2. **JSON Report**: Detailed report saved to `code-analysis-report.json`
+1. **Console Report**: Beautifully formatted terminal output with color indicators
+2. **JSON Report**: Detailed machine-readable report saved to `code-analysis-report.json`
 
 ### Example Output
 
 ```
-📊 CODE ANALYSIS REPORT
+📊 COMPREHENSIVE CODE ANALYSIS REPORT
 ================================================================================
+
+⭐ OVERALL QUALITY SCORE
+🟡 Score: 65/100
 
 📈 OVERVIEW
 Total Files: 64
-Total Lines of Code: 13,196
-Total Code Size: 423.20 KB
-Average Lines per File: 206
-Average File Size: 6.61 KB
+Total Lines: 13,196
+  Code Lines: 11,589
+  Comment Lines: 297
+  Blank Lines: 1,310
+Comments Ratio: 2.56%
 
-📦 DEPENDENCIES
-Frontend:
-  Dependencies: 21
-  DevDependencies: 12
-  Total: 33
+🧮 COMPLEXITY ANALYSIS
+Average Complexity: 16.98
+Files Analyzed: 55
 
-Backend:
-  Dependencies: 6
-  DevDependencies: 0
-  Total: 6
+Complexity Distribution:
+  Low (1-5):        22 files
+  Medium (6-10):    11 files
+  High (11-20):     7 files
+  Very High (20+):  15 files
 
-🏗️  CODE ORGANIZATION
-React Components: 25
-API Routes: 5
-Database Models: 4
-Utility Files: 8
+High Complexity Files (Top 10):
+  1. src/pages/Settings.jsx (complexity: 103)
+  2. src/pages/Explore.jsx (complexity: 93)
+  3. src/components/excel/ChartSelector.jsx (complexity: 91)
+
+💰 TECHNICAL DEBT
+Total Markers: 15
+  TODOs: 10
+  FIXMEs: 3
+  HACKs: 2
+
+🔒 SECURITY ANALYSIS
+Potential Issues Found: 86
+  Critical: 0
+  High: 0
+  Medium: 0
+  Low: 86
 ```
 
-The JSON report file (`code-analysis-report.json`) contains detailed data that can be used for further processing or integration with other tools.
+### Understanding the Quality Score
+
+The quality score is calculated based on:
+- **Complexity** (-5 to -20 points for high complexity)
+- **Comments Ratio** (-5 to -15 points for low documentation)
+- **Technical Debt** (-5 to -15 points for TODO/FIXME markers)
+- **Code Duplication** (-5 to -20 points for duplicate code)
+- **Security Issues** (-5 to -10 points per critical/high issue)
+- **ESLint Failures** (-10 points)
+
+A score of 80+ indicates excellent code quality, 60-79 is good, 40-59 needs improvement, and below 40 requires attention.
+
+### Using the JSON Report
+
+The JSON report file (`code-analysis-report.json`) contains detailed data that can be:
+- Integrated with CI/CD pipelines
+- Used for trend analysis over time
+- Processed by other development tools
+- Included in automated quality gates
 
 ## Environment Variables
 See `.env` for required variables. You will need to provide:
