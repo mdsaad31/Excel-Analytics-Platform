@@ -11,6 +11,7 @@ An advanced analytics platform for uploading, parsing, visualizing, and managing
 - [Project Structure](#project-structure)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
+- [Code Analysis](#code-analysis)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -102,6 +103,70 @@ excel-analytics-platform/
 
 ## API Endpoints
 The backend exposes RESTful endpoints for file history, notifications, saved charts, user profiles, and health checks. See the `server/routes/` directory for details.
+
+## Code Analysis
+
+This project includes a comprehensive code analysis tool that provides insights about the codebase.
+
+### Running Code Analysis
+
+To analyze the codebase, run:
+
+```bash
+npm run analyze
+# or
+pnpm run analyze
+```
+
+### What It Analyzes
+
+The code analysis tool provides the following metrics:
+
+- **File Statistics**: Total files, lines of code, code size
+- **File Distribution**: Breakdown by file type and directory
+- **Largest Files**: Top 10 largest files by lines and size
+- **Dependencies**: Frontend and backend dependency counts
+- **Code Organization**: Components, routes, models, and utility files count
+- **ESLint Results**: Code quality issues detected by ESLint
+
+### Output
+
+The analysis tool generates:
+1. **Console Report**: Formatted output in the terminal
+2. **JSON Report**: Detailed report saved to `code-analysis-report.json`
+
+### Example Output
+
+```
+📊 CODE ANALYSIS REPORT
+================================================================================
+
+📈 OVERVIEW
+Total Files: 64
+Total Lines of Code: 13,196
+Total Code Size: 423.20 KB
+Average Lines per File: 206
+Average File Size: 6.61 KB
+
+📦 DEPENDENCIES
+Frontend:
+  Dependencies: 21
+  DevDependencies: 12
+  Total: 33
+
+Backend:
+  Dependencies: 6
+  DevDependencies: 0
+  Total: 6
+
+🏗️  CODE ORGANIZATION
+React Components: 25
+API Routes: 5
+Database Models: 4
+Utility Files: 8
+```
+
+The JSON report file (`code-analysis-report.json`) contains detailed data that can be used for further processing or integration with other tools.
 
 ## Environment Variables
 See `.env` for required variables. You will need to provide:

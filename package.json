@@ -11,7 +11,8 @@
     "predeploy": "pnpm run build",
     "start": "pnpm run dev",
     "server": "cd server && npm start",
-    "server:dev": "cd server && npm run dev"
+    "server:dev": "cd server && npm run dev",
+    "analyze": "node analyze-code.js"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
